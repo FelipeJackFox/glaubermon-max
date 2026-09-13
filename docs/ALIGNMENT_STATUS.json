@@ -46,11 +46,19 @@
     "glaubermon/evaluation/showdown_transport.py": "eb13ba821ca53c56ff6813aaf713af11a198bde0ce23255c059107cb5d01f091",
     "glaubermon/evaluation/summarize_benchmark.py": "a3bc3bfa8efdbca44a128d64426884c58d280c90664cbcdd946033dda4e245cf",
     "glaubermon/evaluation/training_teams.py": "17a39438bdd830f8e1db7302b499a2405dcdaacab0f578ac504828e294ecc301",
-    "glaubermon/scripts/train_rebel.py": "09b4f58655bf8dd2b8113c9d087e76056ec0513a14767672126efb6ca96962cf",
+    "glaubermon/scripts/train_rebel.py": "9f491386230e2a30d00ff8afd914421c09bf9097bddaaf826f8d2a4f9cccbb24",
     "docs/alignment/pilot-coverage.json": "9b8b563f401c129f4b250053f7427fac2f02a1fb76baf13616e98c8f927c6627"
   },
   "clearance_scope": "Controlled pilot using the pinned development training teams and official Showdown backend; no SOTA claim",
   "clearance_source": "cab336781b981dbbb02747c07321509bec0bcc99",
   "evidence": "docs/alignment/pilot-closure-results.json",
-  "training_started": false
+  "training_started": false,
+  "maintenance_updates": [
+    {
+      "source": "b10ed27fe8f614c35d7065626d063539f015b523",
+      "evidence": "docs/alignment/timeout-results.json",
+      "change": "Allow --decision-seconds 60 for NVIDIA pilot, preserving complete depth-1 search",
+      "gpu_revalidation_pending": true
+    }
+  ]
 }

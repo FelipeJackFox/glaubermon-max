@@ -1,0 +1,61 @@
+{
+  "source": "b10ed27fe8f614c35d7065626d063539f015b523",
+  "previous_source": "f34acb1ef1815cb569c3c2844786be4822584f9a",
+  "change": "Configurable finite positive decision timeout; no search pruning or data contract change",
+  "trainer_sha256": "9f491386230e2a30d00ff8afd914421c09bf9097bddaaf826f8d2a4f9cccbb24",
+  "previous_trainer_sha256": "09b4f58655bf8dd2b8113c9d087e76056ec0513a14767672126efb6ca96962cf",
+  "tests_passed": 575,
+  "tests_seconds": 39.91,
+  "operator_report": {
+    "device": "RTX 4090",
+    "turn": 11,
+    "game": 0,
+    "seconds": 30.35,
+    "independently_reproduced": false
+  },
+  "local_integration": {
+    "purpose": "Frozen-weight integration; no optimizer; original training seed 7331",
+    "device": "cpu",
+    "decision_seconds": 60,
+    "game": {
+      "terminated": true,
+      "winner": "SelfPlay2",
+      "turns": 25,
+      "samples": 61,
+      "seed": [
+        7331,
+        19283,
+        38475,
+        29384
+      ],
+      "teams": [
+        "development_rain",
+        "development_rain"
+      ]
+    },
+    "decisions": 63,
+    "max_seconds": 5.135836292000022,
+    "model_weights_unchanged": true,
+    "implementation_sha256": "9f491386230e2a30d00ff8afd914421c09bf9097bddaaf826f8d2a4f9cccbb24"
+  },
+  "request_audit": {
+    "purpose": "Own legal menus and active PP only; no claim of full transition parity",
+    "requests": 61,
+    "discrepancies": 0,
+    "traces": [
+      {
+        "file": "../evaluation-results/timeout-60s-seed7331/rollouts/game-000000.jsonl",
+        "requests": 61,
+        "discrepancies": []
+      }
+    ]
+  },
+  "raw_sha256": {
+    "timeout-60s-seed7331/timings.json": "2da83030479922007154f6d3aa7c4963212d71933d62a26ab32334cbbb93e7f0",
+    "timeout-60s-seed7331/results.json": "4b539ec00406bd43c4598153cde1d2d1dd16462c893caf0bb32d21a788e0d077",
+    "timeout-60s-seed7331/request-audit.json": "874e9ec6329140e9341aaeefb8a3349adfefbcd642fb6f26e2db37ac72fb4f7c",
+    "timeout-60s-seed7331/rollouts/game-000000.jsonl": "4d545331e4028d2f9b1178e88e6b2df54248f23b799cdccff9774d435d046946"
+  },
+  "original_checkpoint_files_unchanged": 8,
+  "gpu_revalidation_pending": true
+}

@@ -1,7 +1,7 @@
 {
   "purpose": "Integration verification only, not a performance benchmark or retraining",
   "reference": "pokemon-showdown@0.11.11",
-  "total_completed_games": 34,
+  "total_completed_games": 35,
   "control_runs": [
     {
       "directory": "alignment-v4-smoke",
@@ -1481,7 +1481,11 @@
     "alignment-closure-development/game-1.jsonl": "5fd2fe0f65d364dfd492fdb2b0f86f96ea5f93a7c5d0bbe4734ce1b995f6bf02",
     "alignment-closure-development/request-audit.json": "7faa4c2aaae60bfeb5737967d7447efcc2c73bd5bd78d2110c4151e9cfe538fe",
     "alignment-pilot-closure/results.json": "c1d995dd86eef9a60c664c5dec9e20c8d9399d19b05294eeade79fef16c610ef",
-    "alignment-pilot-closure/controlled-trajectories.json": "8c93b2912b35f2fa20a7552ba16065be68c1f262825f1f11ce53834497b1ace8"
+    "alignment-pilot-closure/controlled-trajectories.json": "8c93b2912b35f2fa20a7552ba16065be68c1f262825f1f11ce53834497b1ace8",
+    "timeout-60s-seed7331/timings.json": "2da83030479922007154f6d3aa7c4963212d71933d62a26ab32334cbbb93e7f0",
+    "timeout-60s-seed7331/results.json": "4b539ec00406bd43c4598153cde1d2d1dd16462c893caf0bb32d21a788e0d077",
+    "timeout-60s-seed7331/request-audit.json": "874e9ec6329140e9341aaeefb8a3349adfefbcd642fb6f26e2db37ac72fb4f7c",
+    "timeout-60s-seed7331/rollouts/game-000000.jsonl": "4d545331e4028d2f9b1178e88e6b2df54248f23b799cdccff9774d435d046946"
   },
   "training_allowed": true,
   "batching_comparison": {
@@ -1944,6 +1948,36 @@
       },
       "invalid_actions": [],
       "default_choices": 0
+    },
+    {
+      "directory": "timeout-60s-seed7331",
+      "source": "b10ed27fe8f614c35d7065626d063539f015b523",
+      "implementation_sha256": "9f491386230e2a30d00ff8afd914421c09bf9097bddaaf826f8d2a4f9cccbb24",
+      "depth": 1,
+      "decision_seconds": 60,
+      "device": "cpu",
+      "games": [
+        {
+          "terminated": true,
+          "winner": "SelfPlay2",
+          "turns": 25,
+          "samples": 61,
+          "seed": [
+            7331,
+            19283,
+            38475,
+            29384
+          ],
+          "teams": [
+            "development_rain",
+            "development_rain"
+          ]
+        }
+      ],
+      "unchanged_model_weights": true,
+      "purpose": "Frozen-weight integration; no optimizer; original training seed 7331",
+      "request_audit_requests": 61,
+      "request_audit_discrepancies": 0
     }
   ],
   "original_checkpoint_files_verified_unchanged": 8,
