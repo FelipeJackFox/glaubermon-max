@@ -2,9 +2,11 @@
 
 Código: rama `codex/simulator-training-corrections` del fork `FelipeJackFox/glaubermon-max`. No usar `main` hasta que Santiago incorpore el PR. El cierre de alineación es el de los cinco equipos de [pilot-scope.json](alignment/pilot-scope.json): dos de práctica y tres de evaluación. Se permite un piloto controlado; ampliar equipos requiere otra revisión.
 
-La red y su optimización seleccionan CUDA automáticamente. Showdown, la preparación de estados y la búsqueda siguen consumiendo CPU; una GPU potente no garantiza acelerar toda la corrida. No hay un mínimo de VRAM medido todavía. La validación local fue en CPU (568 pruebas); la instalación CUDA siguiente debe pasar sus comprobaciones en la máquina receptora. No se ha reentrenado con las correcciones finales.
+La red y su optimización seleccionan CUDA automáticamente. Showdown, la preparación de estados y la búsqueda siguen consumiendo CPU; una GPU potente no garantiza acelerar toda la corrida. No hay un mínimo de VRAM medido todavía. La validación local fue en CPU (575 pruebas); la instalación CUDA siguiente debe pasar sus comprobaciones en la máquina receptora. No se ha reentrenado con las correcciones finales.
 
 No hacen falta cuentas de Showdown, contraseñas ni el dataset de 9 GB: esta ruta genera partidas locales y parte del checkpoint que ya está en Git. No pasar `--from-scratch`. Las salidas van a una carpeta nueva bajo `runs/`; no sobrescribir `checkpoints/`.
+
+> **Actualización por timeout en RTX 4090:** usar `--decision-seconds 60` conservando profundidad 1 y todas las alternativas de reemplazo. Para retomar la partida 0 fallida sin borrar su traza, seguir [TIMEOUT_GPU.md](TIMEOUT_GPU.md). El default del CLI sigue en 30 s; estos comandos fijan 60 explícitamente.
 
 ## 1. Instalar en Linux o WSL2 (Bash)
 
@@ -39,7 +41,7 @@ python -c "from pathlib import Path; from glaubermon.evaluation.alignment_gate i
 CUDA_VISIBLE_DEVICES='' python -m pytest tests/ -q -rs
 ```
 
-Resultado de referencia: 568 pruebas aprobadas. No aceptar que las pruebas de Showdown se omitan por faltar el paquete. La asignación `CUDA_VISIBLE_DEVICES=''` afecta solo al comando de pruebas: reproduce su validación en CPU y no deshabilita CUDA para el entrenamiento posterior.
+Resultado de referencia: 575 pruebas aprobadas. No aceptar que las pruebas de Showdown se omitan por faltar el paquete. La asignación `CUDA_VISIBLE_DEVICES=''` afecta solo al comando de pruebas: reproduce su validación en CPU y no deshabilita CUDA para el entrenamiento posterior.
 
 ## 3. Piloto inicial: diez partidas
 
@@ -52,7 +54,7 @@ git status --short > runs/pilot-gpu-v7-01/worktree.txt
 python -m pip freeze > runs/pilot-gpu-v7-01/environment.txt
 nvidia-smi > runs/pilot-gpu-v7-01/gpu.txt
 set -o pipefail
-python -u -m glaubermon.scripts.train_rebel --games 10 --save-every 1 --eval-every 0 --checkpoint-dir runs/pilot-gpu-v7-01 --mechanics-seed 7331 --rollout-backend showdown --showdown-path tools/showdown/node_modules/pokemon-showdown --max-turns 300 --depth 1 --torch-threads 1 2>&1 | tee runs/pilot-gpu-v7-01/train-001.log
+python -u -m glaubermon.scripts.train_rebel --games 10 --save-every 1 --eval-every 0 --checkpoint-dir runs/pilot-gpu-v7-01 --mechanics-seed 7331 --rollout-backend showdown --showdown-path tools/showdown/node_modules/pokemon-showdown --max-turns 300 --depth 1 --decision-seconds 60 --torch-threads 1 2>&1 | tee runs/pilot-gpu-v7-01/train-001.log
 ```
 
 El inicio debe mostrar `Initialized on: cuda` y carga de `checkpoints/glaubermon_rebel_latest.pt`. Se usa profundidad 1 para empezar; no aumentar automáticamente a 4. Después de acumular 64 muestras comienza a actualizar la red. En otra terminal se puede observar la GPU con `nvidia-smi -l 2`; utilización intermitente es esperable por el trabajo de CPU.
@@ -70,11 +72,11 @@ Si falla CUDA, una prueba, una acción oficial, un timeout o aparecen NaN/Inf, d
 Si el piloto anterior terminó con diez partidas y pasó sus comprobaciones, añadir noventa:
 
 ```bash
-python -u -m glaubermon.scripts.train_rebel --games 90 --save-every 10 --eval-every 0 --checkpoint-dir runs/pilot-gpu-v7-01 --mechanics-seed 7331 --rollout-backend showdown --showdown-path tools/showdown/node_modules/pokemon-showdown --max-turns 300 --depth 1 --torch-threads 1 2>&1 | tee runs/pilot-gpu-v7-01/train-002.log
+python -u -m glaubermon.scripts.train_rebel --games 90 --save-every 10 --eval-every 0 --checkpoint-dir runs/pilot-gpu-v7-01 --mechanics-seed 7331 --rollout-backend showdown --showdown-path tools/showdown/node_modules/pokemon-showdown --max-turns 300 --depth 1 --decision-seconds 60 --torch-threads 1 2>&1 | tee runs/pilot-gpu-v7-01/train-002.log
 python -c "import json,torch; from pathlib import Path; p=Path('runs/pilot-gpu-v7-01'); m=json.loads((p/'rebel_meta.json').read_text()); print('Partidas:',m['total_games'],'Muestras:',m['total_samples'],'Dispositivo:',m['device']); assert m['total_games']==100 and m['device'].startswith('cuda'); w=torch.load(p/'glaubermon_rebel_latest.pt',map_location='cpu',weights_only=True); assert all(torch.isfinite(v).all().item() for v in w.values())"
 ```
 
-**`--games` agrega partidas; no es el total objetivo**, aunque la ayuda del CLI todavía diga lo contrario. No volver a ejecutar `--games 90` suponiendo que solo completa las faltantes. Ctrl+C una vez solicita guardar y salir; esperar el mensaje de guardado. Para reanudar, conservar backend, profundidad, límite, equipos y código. Se recuperan pesos y contadores, pero el optimizador y el buffer reinician: la reanudación no es idéntica a una corrida continua.
+**`--games` agrega partidas; no es el total objetivo**, también al reanudar. No volver a ejecutar `--games 90` suponiendo que solo completa las faltantes. Ctrl+C una vez solicita guardar y salir; esperar el mensaje de guardado. Para reanudar, conservar backend, profundidad, límite, equipos y código. Se recuperan pesos y contadores, pero el optimizador y el buffer reinician: la reanudación no es idéntica a una corrida continua.
 
 El objetivo inicial son cien partidas, no una campaña masiva con solo dos equipos de práctica. Antes de ampliarlo, revisar fallos, tiempos y evaluación; diversificar los equipos exige ampliar la cobertura.
 
@@ -129,13 +131,13 @@ Remove-Item Env:CUDA_VISIBLE_DEVICES
 Omitir `set -o pipefail`. Usar estas líneas en lugar de los dos comandos de entrenamiento con `tee`, conservando las comprobaciones de las secciones 3/4:
 
 ```powershell
-python -u -m glaubermon.scripts.train_rebel --games 10 --save-every 1 --eval-every 0 --checkpoint-dir runs/pilot-gpu-v7-01 --mechanics-seed 7331 --rollout-backend showdown --showdown-path tools/showdown/node_modules/pokemon-showdown --max-turns 300 --depth 1 --torch-threads 1 2>&1 | Tee-Object -FilePath runs/pilot-gpu-v7-01/train-001.log
+python -u -m glaubermon.scripts.train_rebel --games 10 --save-every 1 --eval-every 0 --checkpoint-dir runs/pilot-gpu-v7-01 --mechanics-seed 7331 --rollout-backend showdown --showdown-path tools/showdown/node_modules/pokemon-showdown --max-turns 300 --depth 1 --decision-seconds 60 --torch-threads 1 2>&1 | Tee-Object -FilePath runs/pilot-gpu-v7-01/train-001.log
 if ($LASTEXITCODE -ne 0) { throw 'Fallo el piloto: revisar el log antes de continuar' }
 ```
 
 Después de verificar el piloto:
 
 ```powershell
-python -u -m glaubermon.scripts.train_rebel --games 90 --save-every 10 --eval-every 0 --checkpoint-dir runs/pilot-gpu-v7-01 --mechanics-seed 7331 --rollout-backend showdown --showdown-path tools/showdown/node_modules/pokemon-showdown --max-turns 300 --depth 1 --torch-threads 1 2>&1 | Tee-Object -FilePath runs/pilot-gpu-v7-01/train-002.log
+python -u -m glaubermon.scripts.train_rebel --games 90 --save-every 10 --eval-every 0 --checkpoint-dir runs/pilot-gpu-v7-01 --mechanics-seed 7331 --rollout-backend showdown --showdown-path tools/showdown/node_modules/pokemon-showdown --max-turns 300 --depth 1 --decision-seconds 60 --torch-threads 1 2>&1 | Tee-Object -FilePath runs/pilot-gpu-v7-01/train-002.log
 if ($LASTEXITCODE -ne 0) { throw 'Fallo la continuacion: revisar el log' }
 ```

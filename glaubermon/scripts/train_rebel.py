@@ -20,6 +20,7 @@ import random
 import argparse
 import asyncio
 import hashlib
+import math
 from pathlib import Path
 from collections import deque
 from dataclasses import replace
@@ -128,11 +129,14 @@ class AlphaZeroTrainer:
         showdown_path: Optional[str] = None,
         max_turns: int = 300,
         depth: int = 1,
+        decision_seconds: float = 30.0,
     ):
         if rollout_backend not in ("showdown", "internal-privileged"):
             raise ValueError("Unknown rollout backend")
         if max_turns < 1 or depth < 1:
             raise ValueError("max_turns and depth must be positive")
+        if not math.isfinite(decision_seconds) or decision_seconds <= 0:
+            raise ValueError("decision_seconds must be finite and positive")
         self.rollout_backend = rollout_backend
         self.rollout_mode = "official_public_v2" if rollout_backend == "showdown" else "sampled_internal_privileged_v2"
         project_root = Path(__file__).resolve().parents[2]
@@ -143,6 +147,7 @@ class AlphaZeroTrainer:
             raise FileNotFoundError("Install the pinned official simulator and set --showdown-path before training")
         self.max_turns = max_turns
         self.depth = depth
+        self.decision_seconds = decision_seconds
         self.last_game_info = {}
         random.seed(mechanics_seed)
         np.random.seed(mechanics_seed)
@@ -248,6 +253,8 @@ class AlphaZeroTrainer:
             "last_game": self.last_game_info,
             "torch_version": torch.__version__,
             "device": str(self.device),
+            # Operational timeout; successful searches retain the same data contract.
+            "decision_seconds": self.decision_seconds,
             "torch_threads": torch.get_num_threads(),
             "evaluator": "hybrid_0.60",
             "mechanics_seed": self.mechanics_seed,
@@ -303,10 +310,17 @@ class AlphaZeroTrainer:
             trace_dir = Path(self.checkpoint_dir) / 'rollouts'
             trace_dir.mkdir(exist_ok=True)
             trace = trace_dir / f"game-{self.total_games:06d}.jsonl"
-            samples, self.last_game_info = asyncio.run(collect_game(
-                self.model, self.showdown_path, teams, [seed % 65536, 19283, 38475, 29384],
-                depth=self.depth, max_turns=self.max_turns, trace_path=trace,
-                team_pool=TRAINING_TEAMS))
+            try:
+                samples, self.last_game_info = asyncio.run(collect_game(
+                    self.model, self.showdown_path, teams, [seed % 65536, 19283, 38475, 29384],
+                    depth=self.depth, max_turns=self.max_turns, trace_path=trace,
+                    decision_seconds=self.decision_seconds, team_pool=TRAINING_TEAMS))
+            except TimeoutError as exc:
+                raise TimeoutError(
+                    f"Official self-play timed out: game={self.total_games}, seed={seed}, "
+                    f"decision_seconds={self.decision_seconds}; trace={trace}. "
+                    "No samples from this game were added to the replay buffer."
+                ) from exc
             return samples
         state = generate_competitive_battle()
         trajectory = []
@@ -444,6 +458,7 @@ class AlphaZeroTrainer:
         print("  GLAUBERMON MAX: ALPHAZERO SELF-PLAY REINFORCEMENT LEARNING")
         print(f"  Playing {games_to_play} new self-play matches ({self.total_games} -> {target_games} total)")
         print(f"  Auto-saving every {save_every} games | Benchmarking every {eval_every} games")
+        print(f"  Official decision timeout: {self.decision_seconds} seconds")
         print("  Press Ctrl+C at any time to pause and save safely.")
         print("=" * 75)
 
@@ -480,7 +495,7 @@ class AlphaZeroTrainer:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Glaubermon Max AlphaZero / ReBeL Self-Play Trainer")
-    parser.add_argument("--games", type=int, default=500, help="Target total games to reach")
+    parser.add_argument("--games", type=int, default=500, help="Additional games to play, including when resuming")
     parser.add_argument("--save-every", type=int, default=10, help="Save model every N games")
     parser.add_argument("--eval-every", type=int, default=0, help="Experimental internal diagnostic only; official evaluation is a separate frozen run")
     parser.add_argument("--from-scratch", action="store_true", help="Train from scratch without loading prior weights")
@@ -490,6 +505,8 @@ if __name__ == "__main__":
     parser.add_argument("--showdown-path", help="Path to pinned pokemon-showdown npm package")
     parser.add_argument("--max-turns", type=int, default=300)
     parser.add_argument("--depth", type=int, default=1)
+    parser.add_argument("--decision-seconds", type=float, default=30.0,
+                        help="Positive finite timeout per official decision; use 60 for the NVIDIA pilot")
     parser.add_argument("--torch-threads", type=int, default=1, help="CPU threads for small inference batches; recorded in checkpoint metadata")
     args = parser.parse_args()
     if args.torch_threads < 1:
@@ -498,5 +515,6 @@ if __name__ == "__main__":
 
     trainer = AlphaZeroTrainer(checkpoint_dir=args.checkpoint_dir, reset_from_scratch=args.from_scratch,
                               mechanics_seed=args.mechanics_seed, rollout_backend=args.rollout_backend,
-                              showdown_path=args.showdown_path, max_turns=args.max_turns, depth=args.depth)
+                              showdown_path=args.showdown_path, max_turns=args.max_turns, depth=args.depth,
+                              decision_seconds=args.decision_seconds)
     trainer.train(games_to_play=args.games, save_every=args.save_every, eval_every=args.eval_every)
