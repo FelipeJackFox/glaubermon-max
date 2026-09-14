@@ -1,0 +1,80 @@
+{
+  "status": "completed",
+  "checkpoint_sha256": "2aa0deadf7d3ac650981e051544521ee8ccc0b9689f1457f921c0ed99957f0f6",
+  "benchmark_source": "fbdf4e36c3d9dcee7fca2e0185b3b3458c327a68",
+  "device": "cpu",
+  "decision_seconds": 30.0,
+  "cases": [
+    {
+      "trace_sha256": "52c232898a18af378c9666593509a26789162cce728879041b04a78eb2544d1a",
+      "original_failure": {
+        "turn": 17,
+        "side": 1,
+        "force_switch": false,
+        "elapsed_seconds": 30.01600000000326,
+        "limit_seconds": 30.0
+      },
+      "measurements": [
+        {
+          "profile": false,
+          "output": "hybrid-000-timing.json",
+          "status": "completed",
+          "seconds": 15.120344291906804,
+          "neural_forward_calls": 3312
+        },
+        {
+          "profile": true,
+          "output": "hybrid-000-profile.json",
+          "status": "completed",
+          "seconds": 25.00352062494494,
+          "neural_forward_calls": 3312
+        }
+      ]
+    },
+    {
+      "trace_sha256": "4067285394ac7b2e50fc2e7fd42626ebb7d4b2349ec391037a9bb26040822833",
+      "original_failure": {
+        "turn": 12,
+        "side": 2,
+        "force_switch": false,
+        "elapsed_seconds": 30.014999999984866,
+        "limit_seconds": 30.0
+      },
+      "measurements": [
+        {
+          "profile": false,
+          "output": "hybrid-001-timing.json",
+          "status": "completed",
+          "seconds": 14.864639249979518,
+          "neural_forward_calls": 1905
+        },
+        {
+          "profile": true,
+          "output": "hybrid-001-profile.json",
+          "status": "completed",
+          "seconds": 25.473879665951245,
+          "neural_forward_calls": 1905
+        }
+      ]
+    }
+  ],
+  "purpose": "Diagnostic only; process timeout is not a game decision allowance",
+  "profile_preserves_actions_strategy_value": true,
+  "diagnostic_implementation_sha256": "ceb61aded18dd630324e338be25461060f3f739c38b1a158eb361e668a94a4ce",
+  "raw_sha256": {
+    "hybrid-001-profile.pstats": "a98040a8c45bb63be0b6486c6630a57a99eadcdca70edecd241136f7e253bfde",
+    "hybrid-001-timing.json": "2e9dbc6594dae8be26c89f06a6febec7135ca018bba00d721315d52ef4c1932a",
+    "hybrid-000-profile.pstats": "e7e55dbaa66a9eb396582752d2118f3702a45644f1e69dd4f3d3ae98ee303dae",
+    "hybrid-000-profile.profile.txt": "f13f76f7716f133509c49158c10108911dfe565baef55e388280f8c3c1130daf",
+    "hybrid-001-profile.profile.txt": "91bfbe4830be2baf10b198a6dc23483420cbc5102de3596bc17faf9e0cb0e5a0",
+    "hybrid-000-timing.log": "3e719f880bfd331df896dac0b817ebc2d807bd8637f6c792cb30b4fd4294d77b",
+    "hybrid-001-profile.log": "6edd715bc229ff6db314f647c97e08c2dc0d4baca530eac027bdea64bfd579b6",
+    "hybrid-000-timing.json": "0acbb2e78f6799f98e8b14df8748dddf301b249ecd2ef477e3720e611b0a6c0f",
+    "hybrid-000-profile.log": "f7ba238164ba25748b2cb6ea42399d0e6bc8b4fb7f0ef15c60fc0ab5a2709cb4",
+    "hybrid-001-profile.json": "90eb9636ca1c582397f8b7711afecdabfccbf7010a68e2d8c791d3e09abe65cb",
+    "diagnosis.json": "07c13b5b0180d543430b2438e64e6b5fb519e52ad2b09eefb4fecf1ec6f3ec6d",
+    "hybrid-001-timing.log": "ea386666d07e4217705da35c5da74e736840cfa1a76f104304d2f0dd1afd7532",
+    "hybrid-000-profile.json": "c336d2cab19458b29d13922779a0cfd7db9d49dc7de9324569241819fad92644"
+  },
+  "validation": "Two regression tests passed; four sequential replay executions completed. Existing 585-test suite unchanged and not rerun for standalone diagnostic/docs."
+}

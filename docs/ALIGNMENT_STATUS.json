@@ -75,5 +75,17 @@
     "completed_training_games": 100,
     "candidate_sha256": "3a4717efe548bca8514c649dd63175ed500f93ec7bdd9d4e053471b23ed10e0e",
     "playing_strength_validated": false
+  },
+  "latest_gpu_evaluation": {
+    "source": "fbdf4e36c3d9dcee7fca2e0185b3b3458c327a68",
+    "evidence": "docs/alignment/rtx-recovery-results.json",
+    "status": "smoke_failed",
+    "decision_seconds": 30,
+    "failed_turns": [
+      17,
+      12
+    ],
+    "full_evaluation_started": false,
+    "next_step": "diagnose_timeouts on RTX; no new training"
   }
 }

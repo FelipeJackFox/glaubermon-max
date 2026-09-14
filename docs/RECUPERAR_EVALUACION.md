@@ -4,6 +4,24 @@ Los archivos recibidos el 14 de septiembre confirman cien partidas de entrenamie
 
 Las evaluaciones usaron profundidad 2, un proceso y 30 s por decisión. El original acumuló 81 timeouts y el candidato 99. La diferencia emparejada de puntuación con reloj fue −13 puntos porcentuales (IC por bloques −21 a −6): es un peor resultado operativo del candidato, pero los abandonos impiden atribuirlo exclusivamente a sus decisiones de juego. Los ZIP de ambos pilotos son duplicados del mismo experimento de 60 s.
 
+## Resultado recibido: detener la evaluación larga
+
+La entrega RTX del 14 de septiembre, commit `fbdf4e3` sin cambios locales, se detuvo con `smoke_failed`. CUDA ganó las sondas (31.98/5.53 s frente a 61.66/17.50 s en CPU), pero el original excedió 30 s en los turnos 17 y 12. Los controles heurísticos terminaron. No se evaluó el candidato en partidas ni se inició la etapa de 400 partidas. [Evidencia](alignment/rtx-recovery-results.json).
+
+**Siguiente paso: solo diagnosticar los dos fallos en la RTX.** Mantener los pesos, profundidad y límite de evaluación originales. Este comando reproduce ambos frames primero sin profiler y luego con cProfile, guarda los perfiles y termina sin lanzar partidas ni entrenamiento:
+
+```sh
+git pull --ff-only origin codex/simulator-training-corrections
+python -u -m glaubermon.evaluation.diagnose_timeouts --benchmark runs/recovery-v7-01/smoke-original --checkpoint checkpoints/glaubermon_rebel_latest.pt --device cuda --output runs/diagnosis-recovery-v7-01
+python -c "import shutil; shutil.make_archive('entrega-diagnosis-recovery-v7-01','zip',root_dir='runs',base_dir='diagnosis-recovery-v7-01')"
+```
+
+Enviar ese ZIP. La carpeta de salida debe ser nueva. `--process-seconds` limita el proceso de diagnóstico (300 s por ejecución); no altera el reloj permitido al bot. Los tiempos con profiler tienen sobrecoste y no deben compararse como latencia de juego. Si una reproducción falla, se registra en `diagnosis.json`; se conservan las mediciones restantes.
+
+El diagnóstico completo pasó localmente: ambos frames tardaron 15.12 y 14.86 s sin profiler; las ejecuciones con profiler conservaron exactamente acciones, estrategia y valor. Pasaron las dos regresiones de la nueva herramienta. [Evidencia local](alignment/timeout-diagnosis-local.json).
+
+En macOS, los perfiles de ambos frames muestran miles de llamadas a la red además de simulación, encoding y copias de estados. No permiten atribuir los tiempos de Windows a una función concreta: hace falta el perfil CUDA de esta nueva entrega. No se aumentó el reloj ni se recortó la búsqueda para declarar superada la prueba.
+
 ## Cambios
 
 - Preparación de buffers en NumPy y conversión final a tensores CPU. Los valores del esquema v7 se contrastan bit a bit contra el encoder anterior sobre las cinco trayectorias completas; no se eliminan señales.

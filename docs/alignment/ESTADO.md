@@ -2,6 +2,10 @@
 
 Se cerró el alcance de los cinco equipos acordados con Felipe/Santiago. `docs/ALIGNMENT_STATUS.json` permite el piloto exclusivamente con rollouts oficiales, versión, esquema, equipos y código validados. `AlphaZeroTrainer.train()` rechaza cambios fuera de ese contrato. Las tandas locales usan pesos congelados o modelos desechables; el 14 de septiembre se recibió el piloto de 100 partidas entrenado por Santiago. Los ocho archivos originales coinciden con el respaldo. La equivalencia general de Showdown y la mejora de juego siguen siendo hitos distintos.
 
+## Resultado posterior en RTX: diagnóstico pendiente
+
+La recuperación en Windows/RTX con `fbdf4e3` falló en ambos juegos híbridos del original a 30 s (turnos 17 y 12); los controles terminaron. CUDA fue más rápida que CPU en las sondas, pero no alcanzó el límite en el frame original. No comenzaron las partidas del candidato ni las 400 de comparación. Las ocho partidas locales siguen siendo evidencia exclusiva de CPU/macOS. Se preparó un diagnóstico reproducible de ambos frames con perfiles de funciones: [comando actual](../RECUPERAR_EVALUACION.md). No se cambió la búsqueda, el reloj ni los pesos en esta entrega.
+
 ## Actualización del 14 de septiembre: evaluación y rendimiento
 
 El piloto recibido completó 100 partidas, pero las evaluaciones a profundidad 2 y 30 s tuvieron 81 timeouts con el original y 99 con el candidato. Se optimizó la preparación de tensores y la normalización de identificadores conservando las características bit a bit y toda la búsqueda. Pasaron **585 pruebas** y **ocho partidas locales adicionales** con ambos pesos congelados, profundidad 2 y límite de 30 s, sin timeouts, acciones inválidas ni fallbacks. El auditor contrastó **702 solicitudes sin discrepancias** de menús legales y PP.
