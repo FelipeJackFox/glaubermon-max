@@ -15,7 +15,7 @@
   "validated_files": {
     "glaubermon/core/actions.py": "c0c8f085f60a166ac457ed7fe4115e340220918cfa0aef733c39c9f814851d31",
     "glaubermon/core/battle_state.py": "37c940de2b3475967807d79de1b52f06c5c100ffe193e20536d83cf1190a98ba",
-    "glaubermon/core/constants.py": "f280d294318e4c53771921aae68f5cd08e9c7f2ca98c233e339f4a8e04b4002d",
+    "glaubermon/core/constants.py": "fb0bb38a2a5190553ad56110bed859fc499dc069067778bb7a5b73cee5787881",
     "glaubermon/core/field_mechanics.py": "6552244c7c4fcefbd15d7965133d4fd048ca5b2750b5dcc546dc06fd4f3e2af7",
     "glaubermon/core/pokemon.py": "6a5e609ef38519734dec30322f33697eb1b3e3ea18d3a3dc6a8004e768ffcc4a",
     "glaubermon/core/types.py": "a971cbeda32c3848c8b9fa1b76c938b6143e20284183b539b82ac694c2754f65",
@@ -30,7 +30,7 @@
     "glaubermon/search/evaluators.py": "19359be99ea52e060e277d47b26b1808a28c48bf6bdcd5169ff622893f37bc04",
     "glaubermon/search/matrix_solver.py": "5e97733591abb09f2c85d5ad1727d7dc12d4a94d710dadc1d9662b2f80a18760",
     "glaubermon/search/subgame_resolver.py": "dbf3a6a3cf8e5ddadf509202a9bbfd2145936234106b2ca30219b08fd55e508e",
-    "glaubermon/models/embeddings.py": "44250c86e2924330f8cc76104399028efde73bc2a688200eea5537d38fd16489",
+    "glaubermon/models/embeddings.py": "7651da90469861180b552447a1e408a8de3c26e9fcde72a9d926ff4aa3a72284",
     "glaubermon/models/set_transformer.py": "d82919ad3c1099ecf7c64f9f1a69167d0c6363d7354440de50928561deeae741",
     "glaubermon/data/mass_dataset.py": "9b6f508c7e30d14272938f76f1f42384d53c08181099b34aa4eb403969b206cd",
     "glaubermon/data/meta_teams.py": "212cddc5ede96396ee9fce99b48f5687f62a9d19c4aca28b5d8c1ccc5978e861",
@@ -39,26 +39,41 @@
     "glaubermon/data/showdown_dex.py": "a60117800d97a1ea54af6844218d1f68fef68454e9ec86612bfcb1da02d5545a",
     "glaubermon/evaluation/__init__.py": "b5e053d2586be77557a3ee52bf06b1c867cb2649c0899fc2e96060729174e7d1",
     "glaubermon/evaluation/alignment_gate.py": "2c82a925229167a97e517222baa6425caf4c47147b5dc38b7fce9440c95be70f",
-    "glaubermon/evaluation/official_benchmark.py": "6798ff041585841072cbe41ad8d3a96ace53845d733df7abb3da39b41e10de41",
+    "glaubermon/evaluation/official_benchmark.py": "fd7bed3910cbe70d151d857f6f417d3a4353a729873ecc5ecefaadfce3b87da6",
     "glaubermon/evaluation/official_self_play.py": "2e166e8728d6497f6a221bda743b57c4ed717ba69860ccacb4b3b43f55274b8d",
     "glaubermon/evaluation/request_trace_audit.py": "d5561f97416e2dc5c5a8eacb30201c8f2f19d78f3cceb11553df0afc5e56f7fc",
     "glaubermon/evaluation/showdown_bridge.cjs": "2950e12b370471720009e32cea8cdc452caad7aa18b997b8077f889c46c0a0f6",
     "glaubermon/evaluation/showdown_transport.py": "eb13ba821ca53c56ff6813aaf713af11a198bde0ce23255c059107cb5d01f091",
-    "glaubermon/evaluation/summarize_benchmark.py": "a3bc3bfa8efdbca44a128d64426884c58d280c90664cbcdd946033dda4e245cf",
+    "glaubermon/evaluation/summarize_benchmark.py": "7d5c5a6d9b2e0cf9c3fe40eb81927a0ec20e035d876cb74b45697742c11f23d2",
     "glaubermon/evaluation/training_teams.py": "17a39438bdd830f8e1db7302b499a2405dcdaacab0f578ac504828e294ecc301",
     "glaubermon/scripts/train_rebel.py": "9f491386230e2a30d00ff8afd914421c09bf9097bddaaf826f8d2a4f9cccbb24",
-    "docs/alignment/pilot-coverage.json": "9b8b563f401c129f4b250053f7427fac2f02a1fb76baf13616e98c8f927c6627"
+    "docs/alignment/pilot-coverage.json": "9b8b563f401c129f4b250053f7427fac2f02a1fb76baf13616e98c8f927c6627",
+    "glaubermon/evaluation/replay_decision.py": "af4eddfdc5c2dc1cbfdb1c418eade08e122b8c0dfea9e9e8c952cb93aaf20696",
+    "glaubermon/evaluation/compare_checkpoints.py": "e5b181aa474d54401d6746d0514a35e8a729c264fa390b1452c1726c083330e8",
+    "glaubermon/evaluation/performance_recovery.py": "34d54315324560b3d9a843c569f6ec5eabc4f3294fd996abfbbbedf071fb6408"
   },
   "clearance_scope": "Controlled pilot using the pinned development training teams and official Showdown backend; no SOTA claim",
   "clearance_source": "cab336781b981dbbb02747c07321509bec0bcc99",
   "evidence": "docs/alignment/pilot-closure-results.json",
-  "training_started": false,
+  "training_started": true,
   "maintenance_updates": [
     {
       "source": "b10ed27fe8f614c35d7065626d063539f015b523",
       "evidence": "docs/alignment/timeout-results.json",
       "change": "Allow --decision-seconds 60 for NVIDIA pilot, preserving complete depth-1 search",
       "gpu_revalidation_pending": true
+    },
+    {
+      "source": "3f59929b5e19518dc296c7fbf416f72ce742f49d",
+      "evidence": "docs/alignment/performance-results.json",
+      "change": "Exact encoding preparation, bounded identifier cache and explicit inference-device evaluation; unchanged search depth and frozen model weights",
+      "gpu_revalidation_pending": true
     }
-  ]
+  ],
+  "received_pilot": {
+    "source": "299166815d4767c10ca2563991624d3317404869",
+    "completed_training_games": 100,
+    "candidate_sha256": "3a4717efe548bca8514c649dd63175ed500f93ec7bdd9d4e053471b23ed10e0e",
+    "playing_strength_validated": false
+  }
 }

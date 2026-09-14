@@ -1,0 +1,164 @@
+{
+  "implementation_source": "3f59929b5e19518dc296c7fbf416f72ce742f49d",
+  "purpose": "Frozen-checkpoint CPU integration and exact encoding optimization; no claim of improved playing strength",
+  "tests": {
+    "passed": 585,
+    "log_sha256": "582484fb6bc93fde5ade54892d449b8433439422949b9d906f3cfe9d181cddd9"
+  },
+  "encoder_parity": {
+    "reference": "2991668",
+    "complete_trajectories": 5,
+    "snapshots": 297,
+    "bitwise_equal": true
+  },
+  "recovery": {
+    "status": "completed",
+    "devices": [
+      "cpu"
+    ],
+    "probes": {
+      "cpu": {
+        "seconds": [
+          16.260610333061777,
+          4.788362165912986
+        ],
+        "maximum": 16.260610333061777
+      }
+    },
+    "failures": [],
+    "selected_device": "cpu",
+    "hashes": {
+      "checkpoints/glaubermon_rebel_latest.pt": "2aa0deadf7d3ac650981e051544521ee8ccc0b9689f1457f921c0ed99957f0f6",
+      "../entregas/santiago-2026-09-14/entrega-pilot-gpu-v7-60s-01/pilot-gpu-v7-60s-01/glaubermon_rebel_latest.pt": "3a4717efe548bca8514c649dd63175ed500f93ec7bdd9d4e053471b23ed10e0e",
+      "../entregas/santiago-2026-09-14/entrega-eval-original-v7-01/eval-original-v7-01/hybrid-000.jsonl": "b37ddad08115c0058a4df93956a38d2550aefb9f51fec2b885b6ef7372e3e87c",
+      "../entregas/santiago-2026-09-14/entrega-eval-candidate-v7-01/eval-candidate-v7-01/hybrid-000.jsonl": "1d2f172e69d47c2d89ecc31328ad4c7e7ea5603d6733d1dcb147edef640e9f2e"
+    },
+    "decision_seconds": 30.0,
+    "requested_games": 2
+  },
+  "request_audit": {
+    "purpose": "Own legal menus and active PP only; no claim of full transition parity",
+    "requests": 702,
+    "discrepancies": 0,
+    "traces": [
+      {
+        "file": "../evaluation-results/performance-recovery-cpu-01/smoke-original/hybrid-000.jsonl",
+        "requests": 48,
+        "discrepancies": []
+      },
+      {
+        "file": "../evaluation-results/performance-recovery-cpu-01/smoke-original/hybrid-001.jsonl",
+        "requests": 74,
+        "discrepancies": []
+      },
+      {
+        "file": "../evaluation-results/performance-recovery-cpu-01/smoke-original/heuristic-000.jsonl",
+        "requests": 57,
+        "discrepancies": []
+      },
+      {
+        "file": "../evaluation-results/performance-recovery-cpu-01/smoke-original/heuristic-001.jsonl",
+        "requests": 150,
+        "discrepancies": []
+      },
+      {
+        "file": "../evaluation-results/performance-recovery-cpu-01/smoke-candidate/hybrid-000.jsonl",
+        "requests": 60,
+        "discrepancies": []
+      },
+      {
+        "file": "../evaluation-results/performance-recovery-cpu-01/smoke-candidate/hybrid-001.jsonl",
+        "requests": 106,
+        "discrepancies": []
+      },
+      {
+        "file": "../evaluation-results/performance-recovery-cpu-01/smoke-candidate/heuristic-000.jsonl",
+        "requests": 57,
+        "discrepancies": []
+      },
+      {
+        "file": "../evaluation-results/performance-recovery-cpu-01/smoke-candidate/heuristic-001.jsonl",
+        "requests": 150,
+        "discrepancies": []
+      }
+    ]
+  },
+  "completed_games": 8,
+  "timeouts": 0,
+  "invalid_actions": 0,
+  "fallbacks": 0,
+  "original_checkpoint_files_verified_unchanged": 8,
+  "pending": [
+    "RTX 4090 CPU versus CUDA probes and complete games",
+    "400-game matched evaluation before claiming candidate improvement"
+  ],
+  "runs": [
+    {
+      "directory": "performance-recovery-cpu-01/smoke-original",
+      "source": "3f59929b5e19518dc296c7fbf416f72ce742f49d",
+      "depth": 2,
+      "device": "cpu",
+      "decision_seconds": 30,
+      "checkpoint_sha256": "2aa0deadf7d3ac650981e051544521ee8ccc0b9689f1457f921c0ed99957f0f6",
+      "latency_seconds": {
+        "median": 0.5368399584549479,
+        "maximum": 15.277176833013073
+      }
+    },
+    {
+      "directory": "performance-recovery-cpu-01/smoke-candidate",
+      "source": "3f59929b5e19518dc296c7fbf416f72ce742f49d",
+      "depth": 2,
+      "device": "cpu",
+      "decision_seconds": 30,
+      "checkpoint_sha256": "3a4717efe548bca8514c649dd63175ed500f93ec7bdd9d4e053471b23ed10e0e",
+      "latency_seconds": {
+        "median": 0.8028996040229686,
+        "maximum": 12.000696000060998
+      }
+    }
+  ],
+  "raw_sha256": {
+    "comparison.json": "6d6618a675bb5e35a78af3b58e1eabc291717b89915238cc9281abbd9b0f452a",
+    "probe-candidate-cpu.json": "cfa9fde4e516fc5dd4444d56b73418b207fca86969ce660093955f556f7b1bb8",
+    "probe-candidate-cpu.log": "80434bbeb4a487ec28ac7313e2e6a9a10be53a0fa483c52ba0a3a9191235c42a",
+    "probe-original-cpu.json": "e8d17efa394d5d8854dcb32faf63570cb6481b6ad36f4dbfb40eca25d1f8f8e5",
+    "probe-original-cpu.log": "fa6725942fa51fcbff19c076328d7a90778a45d6c447f2d12c8d1439b7edd145",
+    "recovery.json": "dcf1e7602eaaa4a4f1f63cb53dfa87a0ba874ba22a52872df0132397550c4709",
+    "request-audit.json": "af87b6462e302e24d6ada5b4c20e0522c136d8e2f1a238d86483be68b9a7ac27",
+    "smoke-candidate/RESULTADOS.md": "58919bb53132dac39e86bfb701936c08fed9f0f11c46532da09ca8c138b305d9",
+    "smoke-candidate/heuristic-000.json": "d0b5d24b4d0f7b8ca0dd2c77ca07d5a4b32051f03c1864c846330b743408f0cc",
+    "smoke-candidate/heuristic-000.jsonl": "d9f89d072c661be1ad1836f8a0736c024ebe421fdd24a8a2074c62dda1fdcb3c",
+    "smoke-candidate/heuristic-000.log": "6aa91db8eb90d6f9067f4a7ab8f6516b9df8c57d965eef31089a1c48925f2f70",
+    "smoke-candidate/heuristic-001.json": "408f99be59c43645dc28825b44ec77b2381691ccb39d4e36b6febb9ad3655103",
+    "smoke-candidate/heuristic-001.jsonl": "a168221d7dba30d80d7036dd6b726d53d6abfc12f1c16131034bea5b1293e0ea",
+    "smoke-candidate/heuristic-001.log": "80a1459e1b8449bbc28fd97d38747b92f5a1c86e01609c73695c422edbe13741",
+    "smoke-candidate/hybrid-000.json": "9e828a6c21939765ca2f955b6068447b29d4afede422dcaf8b7b2c38fa72bdbb",
+    "smoke-candidate/hybrid-000.jsonl": "296289ef5e98dcd0681305ee1323f005934f42b467e29c1d00bf41c5e7df5122",
+    "smoke-candidate/hybrid-000.log": "e2acdd2df26daf0546c06bd84c237ecc40cdf3952b309cf19f4893b315083b10",
+    "smoke-candidate/hybrid-001.json": "8d4371f7e7fa757ffde2a37ec573397434b1cb8be9fcdc160399f96b14008d89",
+    "smoke-candidate/hybrid-001.jsonl": "197ffd56299b904ff24ae7c243e69451dcb1bb76205d28863efa6b77c79df4c0",
+    "smoke-candidate/hybrid-001.log": "2b73413e8dbd34d81f9a7c50ff95a8f743f06f9f0d8cda72e4b0384719b7f4b7",
+    "smoke-candidate/manifest.json": "eb73de90d936e1e5cf02603211c80c339a46d21173b2eb5c68a1f4693379e89c",
+    "smoke-candidate/summary.json": "51aaedc2cbd8baa3d077eea6051a6845a83f45c3ed77c915107242530106db98",
+    "smoke-candidate-summary.log": "e57e723f656f66c80d8585a46b9cc57dc9e0ba88ada4d9b0408fefd2e19a5ff5",
+    "smoke-candidate.log": "de9e84a8602cdc4ef34ee74dd8faa278ac89844047c6eb3676918b3a729c567f",
+    "smoke-original/RESULTADOS.md": "1c53baa5d849a1523954c842df61ed85da5b795df2a476fbaf9559b3f1798b3f",
+    "smoke-original/heuristic-000.json": "9f211d2c36e90ac4e04ba65855316624c35483f7862f26b4891ecb7ab605dcb6",
+    "smoke-original/heuristic-000.jsonl": "d9f89d072c661be1ad1836f8a0736c024ebe421fdd24a8a2074c62dda1fdcb3c",
+    "smoke-original/heuristic-000.log": "6aa91db8eb90d6f9067f4a7ab8f6516b9df8c57d965eef31089a1c48925f2f70",
+    "smoke-original/heuristic-001.json": "bec0f76ba7987e3792200c48ae0d749a12d2576d5b0348b89576e291ead8a8a0",
+    "smoke-original/heuristic-001.jsonl": "a168221d7dba30d80d7036dd6b726d53d6abfc12f1c16131034bea5b1293e0ea",
+    "smoke-original/heuristic-001.log": "80a1459e1b8449bbc28fd97d38747b92f5a1c86e01609c73695c422edbe13741",
+    "smoke-original/hybrid-000.json": "3aa3a169271fab61440e28214e57b549ceb525e048b6d0950c7cb1bbb3c5ded4",
+    "smoke-original/hybrid-000.jsonl": "fc5eb9041685da37af2d65d8f6322d671d4066bc5050140514b35817c72874c2",
+    "smoke-original/hybrid-000.log": "295afc18bc11f55febcdf05c348da2bbd57faf2fcfeb3fc8e8cf402c2a761be5",
+    "smoke-original/hybrid-001.json": "578e14790fc2f5f33bf1b7ee2489666a459c3acfffae922bc00fed9165a9eeea",
+    "smoke-original/hybrid-001.jsonl": "ed4945ea958ebc2da0da6d31acb35e6e0506d2b9a2f2e91d96d6d269412e17d6",
+    "smoke-original/hybrid-001.log": "fad6b8ab0671982bf657b1a91d24dde31ee24ee2282d3754071d3204583ac8ad",
+    "smoke-original/manifest.json": "003ae29fdd56146c3b0311121e39a03ef7df4ebf3985404a1ff0636f0b88ceec",
+    "smoke-original/summary.json": "c4c15f0438902b3583527acf886fb9711fbf06a7f06e4713443b7bc1d956416e",
+    "smoke-original-summary.log": "087cbc23324c03c8fe3990538cd97a3e435d7b8056fced3ba1d051baab66670d",
+    "smoke-original.log": "44a31fe6795856a16ded6ca6954da560332f0e2e2a0a3c41ffc7feb86444f699"
+  }
+}

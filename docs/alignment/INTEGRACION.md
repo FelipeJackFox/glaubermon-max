@@ -1,7 +1,8 @@
 # Integración local de la alineación con Showdown
 
-Se completaron **35 partidas** sobre Pokémon Showdown 0.11.11, sin acciones inválidas, fallbacks ni timeouts. Son pruebas de funcionamiento; el tamaño y la repetición de escenarios no permiten concluir una mejora de winrate ni proximidad al SOTA.
+Se completaron **43 partidas** sobre Pokémon Showdown 0.11.11, sin acciones inválidas, fallbacks ni timeouts. Son pruebas de funcionamiento; el tamaño y la repetición de escenarios no permiten concluir una mejora de winrate ni proximidad al SOTA.
 
+- `3f59929`: ocho partidas en CPU con original y candidato congelados, profundidad 2 y 30 s; 702 solicitudes auditadas sin discrepancias. Comprobación operativa, no conclusión de winrate. [Evidencia](performance-results.json).
 - `970aff6`: cuatro partidas a profundidad 1 contra SimpleHeuristicsPlayer, dos a profundidad 2 contra ese control y dos entre equipos de desarrollo con pesos congelados. Las dos de desarrollo usan `development_offense`/`development_rain`, verifican tensores de 68 características por Pokémon y terminan sin actualizar ningún parámetro. Sus trayectorias se usan como diagnóstico y no se ejecutó optimizador. Se observaron 4 usos de Substitute y 6 de Magma Storm; Taunt no fue elegido en estas dos partidas y su validación proviene de los fixtures controlados.
 - `951cf57`: dos partidas del híbrido a profundidad 2 tras las correcciones de Taunt sobre un reemplazo y cambio de perspectiva.
 - `eaa3129`: repetición final de esas dos partidas con evaluación por lotes de todas las alternativas de reemplazo, sin podar opciones. Ambas completadas y sin errores de acción. Las secuencias de decisiones oficiales fueron idénticas a las de la corrida anterior. Las llamadas de inferencia pasan de 63,710 a 20,341. Latencia de decisión: mediana 1.141 s, p95 6.529 s, máximo 15.534 s. El límite configurado fue 30 s.
@@ -15,6 +16,6 @@ Se completaron **35 partidas** sobre Pokémon Showdown 0.11.11, sin acciones inv
 
 Las fuentes, resultados individuales, latencias y hashes de los registros completos están en [integration-results.json](integration-results.json). Los registros grandes se conservan localmente en `../evaluation-results/alignment-v4-*` y `../evaluation-results/alignment-fields-*` / `../evaluation-results/alignment-restrictions-*` / `../evaluation-results/alignment-history-*` / `../evaluation-results/alignment-callbacks-*` y `../evaluation-results/alignment-closure-*` con respecto al repositorio. Los resultados del piloto histórico `01a6ee1` siguen separados.
 
-La batería actual pasó **575 pruebas** e incluyó **26,431 ejecuciones oficiales controladas**, más una secuencia de historial mediante el adaptador real. El cierre acotado habilita el piloto por la ruta oficial y los equipos/código fijados; todavía no se inició reentrenamiento. Ver [estado](ESTADO.md).
+La batería actual pasó **585 pruebas** e incluyó **26,431 ejecuciones oficiales controladas**, más una secuencia de historial mediante el adaptador real. El cierre acotado habilita el piloto por la ruta oficial y los equipos/código fijados; se recibió el piloto entrenado de Santiago y su comparación completa sigue pendiente. Ver [estado](ESTADO.md).
 
 El auditor reproducible es `python -m glaubermon.evaluation.request_trace_audit <trazas.jsonl...> --output <reporte.json>`. El reporte y el hash del auditor quedan registrados en el índice de evidencia. Reproduce ambos canales filtrados por separado; no entrega al bot información privada del rival.

@@ -12,12 +12,17 @@ Las evaluaciones usaron profundidad 2, un proceso y 30 s por decisión. El origi
 - `official_benchmark --device cpu|cuda|auto` permite elegir y registrar el dispositivo. Pedir CUDA sin tenerla produce un error. Cada timeout registra el turno, lado, fase y tiempo transcurrido; los percentiles se identifican como tiempos de decisiones exitosas.
 - Los resúmenes muestran partidas completadas y timeouts por separado y eliminan texto histórico que no correspondía a corridas nuevas. `compare_checkpoints` compara candidato contra original con bloques emparejados y rechaza configuraciones distintas.
 
+## Validación local completada
+
+Pasaron 585 pruebas, incluida igualdad bit a bit del encoder en 297 estados de cinco trayectorias. Ocho partidas con ambos checkpoints congelados terminaron en CPU/macOS a profundidad 2 y 30 s sin timeouts, acciones inválidas ni fallbacks; 702 solicitudes no mostraron discrepancias de menús legales/PP. Las sondas originales tardaron 16.26 s y 4.79 s. Esta comprobación no establece mejora de juego ni valida la RTX. [Evidencia y hashes](alignment/performance-results.json).
+
 ## Ejecutar en la máquina de Santiago
 
 Desde la raíz del clon del fork, con `.venv` activado. Conservar los directorios originales de entrenamiento/evaluación. Los comandos siguientes suponen que siguen en `runs/` como en la entrega anterior.
 
 ```sh
 git pull --ff-only origin codex/simulator-training-corrections
+npm --prefix tools/showdown ci
 python -m pip check
 python -c "import torch; assert torch.cuda.is_available(), 'Revisar CUDA antes de continuar'; print(torch.__version__,torch.cuda.get_device_name(0))"
 python -c "from pathlib import Path; import hashlib; p=Path('runs/pilot-gpu-v7-60s-01/glaubermon_rebel_latest.pt'); assert hashlib.sha256(p.read_bytes()).hexdigest()=='3a4717efe548bca8514c649dd63175ed500f93ec7bdd9d4e053471b23ed10e0e'; print('Candidato entregado OK')"
