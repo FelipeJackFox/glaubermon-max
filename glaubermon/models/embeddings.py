@@ -18,17 +18,17 @@ FIELD_DIM = 40
 FEATURE_SCHEMA = "public_callbacks_v7"
 
 
-_MOVE_ENCODING_CACHE: Dict[Tuple, torch.Tensor] = {}
+_MOVE_ENCODING_CACHE: Dict[Tuple, np.ndarray] = {}
 
 
-def encode_move(move: Move) -> torch.Tensor:
-    """Encode a single move into a 1D feature vector of size MOVE_DIM (with memoization)."""
+def _move_array(move: Move) -> np.ndarray:
+    """Internal cached features; callers must copy into their own output buffers."""
     key = (move.base_power, move.accuracy, move.priority, move.pp, move.move_type, move.category, move.pp_known)
     cached = _MOVE_ENCODING_CACHE.get(key)
     if cached is not None:
-        return cached.clone()
+        return cached
 
-    vec = torch.zeros(MOVE_DIM, dtype=torch.float32)
+    vec = np.zeros(MOVE_DIM, dtype=np.float32)
     vec[0] = move.base_power / 200.0
     vec[1] = move.accuracy
     vec[2] = (move.priority + 3) / 8.0  # Priority typically -3 to +5
@@ -49,34 +49,51 @@ def encode_move(move: Move) -> torch.Tensor:
 
     if len(_MOVE_ENCODING_CACHE) >= 4096:
         _MOVE_ENCODING_CACHE.clear()
+    vec.flags.writeable = False
     _MOVE_ENCODING_CACHE[key] = vec
-    return vec.clone()
+    return vec
 
 
-def encode_volatiles(mon):
+def encode_move(move: Move) -> torch.Tensor:
+    return torch.from_numpy(_move_array(move).copy())
+
+
+def _volatile_values(mon):
     sub = mon.volatiles.get("substitute",{}).get("hp",0)
     taunt = mon.volatiles.get("taunt",{}).get("duration",0)
     bind = mon.volatiles.get("partiallytrapped",{}).get("duration",0)
     if "trapped" in mon.volatiles or "request_trapped" in mon.volatiles: bind = -1
     confusion = mon.volatiles.get("confusion",{}).get("time",0)
-    return torch.tensor([sub / max(1,mon.max_hp) if sub >= 0 else -1,
-                         taunt / 4, bind / 8, confusion / 5],dtype=torch.float32)
+    return [sub / max(1,mon.max_hp) if sub >= 0 else -1,
+                         taunt / 4, bind / 8, confusion / 5]
 
 
-def encode_restrictions(mon):
+def encode_volatiles(mon):
+    return torch.tensor(_volatile_values(mon), dtype=torch.float32)
+
+
+def _fill_restrictions(mon, result):
     # Presence is separate from move identity: public logs can leave it unknown.
-    result = np.zeros(15,dtype=np.float32)
     for i,key in enumerate(("encore","disable","leechseed")):
         result[i] = float(key in mon.volatiles)
     for offset,move_id in ((3,mon.volatiles.get("encore",{}).get("move")),
                            (7,mon.volatiles.get("disable",{}).get("move")),(11,mon.last_move)):
         for slot,move in enumerate(mon.moves[:4]):
             result[offset+slot] = float(move.id == move_id)
+
+
+def encode_restrictions(mon):
+    result = np.zeros(15, dtype=np.float32)
+    _fill_restrictions(mon, result)
     return torch.from_numpy(result)
 
 
+def _callback_values(mon):
+    return [float(mon.protean_used), float("roost" in mon.volatiles), float("flashfire" in mon.volatiles)]
+
+
 def encode_callbacks(mon):
-    return torch.tensor([float(mon.protean_used),float('roost' in mon.volatiles),float('flashfire' in mon.volatiles)],dtype=torch.float32)
+    return torch.tensor(_callback_values(mon), dtype=torch.float32)
 
 
 def encode_pokemon(mon: Optional[Pokemon], is_active: bool = False) -> Tuple[torch.Tensor, torch.Tensor]:
@@ -143,10 +160,10 @@ def encode_battle_state(state: BattleState) -> Tuple[Tuple[torch.Tensor, torch.T
         mon = state.p1.pokemon[i] if i < len(state.p1.pokemon) else None
         if mon and not mon.is_fainted:
             for j in range(min(4, len(mon.moves))):
-                p1_moves_t[i, j] = encode_move(mon.moves[j]).numpy()
-            p1_stats_t[i, 64:68] = encode_volatiles(mon).numpy()
-            p1_stats_t[i, 68:83] = encode_restrictions(mon).numpy()
-            p1_stats_t[i, 83:86] = encode_callbacks(mon).numpy()
+                p1_moves_t[i, j] = _move_array(mon.moves[j])
+            p1_stats_t[i, 64:68] = _volatile_values(mon)
+            _fill_restrictions(mon, p1_stats_t[i, 68:83])
+            p1_stats_t[i, 83:86] = _callback_values(mon)
             p1_stats_t[i, 1] = mon.hp_percent
             p1_stats_t[i, 2] = 1.0 if i == state.p1.active_index else 0.0
             p1_stats_t[i, 3] = 1.0 if mon.is_terastallized else 0.0
@@ -172,10 +189,10 @@ def encode_battle_state(state: BattleState) -> Tuple[Tuple[torch.Tensor, torch.T
         mon = state.p2.pokemon[i] if i < len(state.p2.pokemon) else None
         if mon and not mon.is_fainted:
             for j in range(min(4, len(mon.moves))):
-                p2_moves_t[i, j] = encode_move(mon.moves[j]).numpy()
-            p2_stats_t[i, 64:68] = encode_volatiles(mon).numpy()
-            p2_stats_t[i, 68:83] = encode_restrictions(mon).numpy()
-            p2_stats_t[i, 83:86] = encode_callbacks(mon).numpy()
+                p2_moves_t[i, j] = _move_array(mon.moves[j])
+            p2_stats_t[i, 64:68] = _volatile_values(mon)
+            _fill_restrictions(mon, p2_stats_t[i, 68:83])
+            p2_stats_t[i, 83:86] = _callback_values(mon)
             p2_stats_t[i, 1] = mon.hp_percent
             p2_stats_t[i, 2] = 1.0 if i == state.p2.active_index else 0.0
             p2_stats_t[i, 3] = 1.0 if mon.is_terastallized else 0.0

@@ -4,6 +4,22 @@ Los archivos recibidos el 14 de septiembre confirman cien partidas de entrenamie
 
 Las evaluaciones usaron profundidad 2, un proceso y 30 s por decisión. El original acumuló 81 timeouts y el candidato 99. La diferencia emparejada de puntuación con reloj fue −13 puntos porcentuales (IC por bloques −21 a −6): es un peor resultado operativo del candidato, pero los abandonos impiden atribuirlo exclusivamente a sus decisiones de juego. Los ZIP de ambos pilotos son duplicados del mismo experimento de 60 s.
 
+## Corrección posterior al perfil CUDA: encoder directo
+
+El perfil recibido confirma miles de estados codificados por decisión. Se eliminan las conversiones intermedias tensor→NumPy y los clones temporales por movimiento; se escriben las características directamente en buffers propios. El caché de movimientos conserva un máximo de 4,096 entradas y sus arrays internos son de solo lectura. Las funciones públicas siguen devolviendo tensores independientes. Se conserva `public_callbacks_v7`, la búsqueda y los checkpoints.
+
+Los dos frames originales bajaron de 15.12/14.86 s a 11.41/11.06 s en CPU/macOS, con exactamente las mismas acciones, estrategia, valor y llamadas a la red. Pasaron las 587 pruebas. Las cinco trayectorias (297 estados) conservan características bit a bit. Son mediciones locales, no garantía de cumplir 30 s en RTX. [Evidencia](alignment/direct-encoding-results.json).
+
+**Ejecutar ahora esta comprobación corta en RTX**, conservando la entrega anterior:
+
+```sh
+git pull --ff-only origin codex/simulator-training-corrections
+python -u -m glaubermon.evaluation.diagnose_timeouts --benchmark runs/recovery-v7-01/smoke-original --checkpoint checkpoints/glaubermon_rebel_latest.pt --device cuda --output runs/diagnosis-direct-encoding-v7-01
+python -c "import shutil; shutil.make_archive('entrega-diagnosis-direct-encoding-v7-01','zip',root_dir='runs',base_dir='diagnosis-direct-encoding-v7-01')"
+```
+
+Compartir el ZIP; no iniciar entrenamiento ni la evaluación larga todavía. Si sigue excediendo el reloj, esta optimización no basta y se debe continuar con el coste restante. La poda sigue sin activarse. Las secciones siguientes documentan el diagnóstico anterior.
+
 ## Resultado recibido: detener la evaluación larga
 
 La entrega RTX del 14 de septiembre, commit `fbdf4e3` sin cambios locales, se detuvo con `smoke_failed`. CUDA ganó las sondas (31.98/5.53 s frente a 61.66/17.50 s en CPU), pero el original excedió 30 s en los turnos 17 y 12. Los controles heurísticos terminaron. No se evaluó el candidato en partidas ni se inició la etapa de 400 partidas. [Evidencia](alignment/rtx-recovery-results.json).

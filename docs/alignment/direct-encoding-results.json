@@ -1,0 +1,47 @@
+{
+  "purpose": "Exact encoding optimization; same search, precision and frozen checkpoints",
+  "encoder_sha256": "f687ea8ea11924f8e1765b1cc2e2d920e8e5469c1d26a75612175af5737e42be",
+  "parity_snapshots": 297,
+  "trajectories": 5,
+  "device": "CPU/macOS",
+  "rtx_validation_pending": true,
+  "frames": [
+    {
+      "turn": 17,
+      "before_seconds": 15.120344291906804,
+      "after_seconds": 11.407612915965728,
+      "reduction_fraction": 0.24554542570358817,
+      "exact_actions_strategy_value_and_forward_count": true
+    },
+    {
+      "turn": 12,
+      "before_seconds": 14.864639249979518,
+      "after_seconds": 11.062155625084415,
+      "reduction_fraction": 0.2558073264307671,
+      "exact_actions_strategy_value_and_forward_count": true
+    }
+  ],
+  "raw_sha256": {
+    "hybrid-001-profile.pstats": "21fa207c9df9ae10b703d54a5ffed8a7b03f4eb2b1f22e42176f1d23c51bbf63",
+    "hybrid-001-timing.json": "6c7526b71e353ab1943e9b128cb682ec82e974f0e3e2c6d56f4815dafbddac80",
+    "hybrid-000-profile.pstats": "9d2f61225b767c7df195a790ba0beea8e80f87fe69d5819b59fdf2242f4c8f3f",
+    "hybrid-000-profile.profile.txt": "951798e78180d64acfea0a07bcffc7998bfe8c68e32f3cd5e272282b22ad198e",
+    "hybrid-001-profile.profile.txt": "68846d648e36681aa558080fda6c0335c48713a5b4ba7a592610c5906b9df960",
+    "hybrid-000-timing.log": "e3a1e655dc99b114b0d78316fc8a06db4abdc68b5e50ddfcd4d319871de43f08",
+    "hybrid-001-profile.log": "3336188a4bdd37864004acb2bea39fef93396eb5d8e91a927b87910308c962c3",
+    "hybrid-000-timing.json": "e2906d19f95cfd32ce4a6f60b086d809782333c66a1391bc393be20c362444cc",
+    "hybrid-000-profile.log": "fb4bc81d8ea913f69e6d21e37d3bba5cd7d083e7ef35d165d8a2fb36b3e60584",
+    "hybrid-001-profile.json": "85856a1e7df8b151b7292fa8b6fdf529dad20483cb4569450733ba87486cb36b",
+    "diagnosis.json": "1869ea2ec12e1b50f3c061509bcb2d25d5c901b2c2701c6a67c046a87f73b331",
+    "hybrid-001-timing.log": "f87c4cef6baff501100e702d60626faa5efed6746659f3e78190a5fd766850ff",
+    "hybrid-000-profile.json": "c82a6cc1b3d0866b3aafd5e1be5f21fb5b3fbfb4f7952baa22862e91bf8491dc"
+  },
+  "tests_passed": 587,
+  "test_log_sha256": "4dc85b91c9867a20627d262be51669ae0ac1f731e2eea046ba47e9ca491b1de2",
+  "candidate_check": {
+    "checkpoint_sha256": "3a4717efe548bca8514c649dd63175ed500f93ec7bdd9d4e053471b23ed10e0e",
+    "seconds": 3.5079223751090467,
+    "exact_actions_strategy_value_and_forward_count": true,
+    "report_sha256": "c593e3ce410b5e359ceae3b99d0b46a2f3de7d5dfc2907902dbd2151bcfbfafb"
+  }
+}
