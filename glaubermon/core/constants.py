@@ -1,6 +1,7 @@
 """Constants, Type Chart, and Mathematical Formulas for Pokémon Mechanics."""
 
 import re
+from functools import lru_cache
 from typing import Optional, Tuple
 from glaubermon.core.types import PokemonType, StatusCondition, Weather, Terrain
 
@@ -9,7 +10,12 @@ def clean_key(name: Optional[str]) -> str:
     """Authoritative Showdown ID normalizer (lowercase alphanumeric only)."""
     if not name:
         return ""
-    return re.sub(r"[^a-zA-Z0-9]", "", str(name)).lower()
+    return _clean_key_text(str(name))
+
+
+@lru_cache(maxsize=4096)
+def _clean_key_text(name: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9]", "", name).lower()
 
 # 18-type effectiveness chart (Attacking Type -> Defending Type -> Multiplier)
 # Defaults to 1.0 if not listed.

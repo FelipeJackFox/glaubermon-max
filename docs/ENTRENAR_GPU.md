@@ -1,5 +1,7 @@
 # Entrega para entrenamiento con NVIDIA
 
+> **14 de septiembre:** el piloto de cien partidas ya fue recibido. Antes de entrenar más, seguir [RECUPERAR_EVALUACION.md](RECUPERAR_EVALUACION.md): la evaluación anterior sufrió 81/99 timeouts. Las instrucciones siguientes conservan el procedimiento del piloto inicial.
+
 Código: rama `codex/simulator-training-corrections` del fork `FelipeJackFox/glaubermon-max`. No usar `main` hasta que Santiago incorpore el PR. El cierre de alineación es el de los cinco equipos de [pilot-scope.json](alignment/pilot-scope.json): dos de práctica y tres de evaluación. Se permite un piloto controlado; ampliar equipos requiere otra revisión.
 
 La red y su optimización seleccionan CUDA automáticamente. Showdown, la preparación de estados y la búsqueda siguen consumiendo CPU; una GPU potente no garantiza acelerar toda la corrida. No hay un mínimo de VRAM medido todavía. La validación local fue en CPU (575 pruebas); la instalación CUDA siguiente debe pasar sus comprobaciones en la máquina receptora. No se ha reentrenado con las correcciones finales.

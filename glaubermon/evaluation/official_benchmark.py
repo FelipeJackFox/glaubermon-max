@@ -40,8 +40,13 @@ async def play_game(args, game_id, mode, out):
     random.seed(args.seed + game_id)
     np.random.seed(args.seed + game_id)
     torch.manual_seed(args.seed + game_id)
+    from glaubermon.models.set_transformer import GlaubermonMaxNet
+    from glaubermon.evaluation.replay_decision import inference_device
+    device = inference_device(getattr(args, 'device', 'auto'))
+    model = GlaubermonMaxNet().to(device)
+    model.load_compatible_state_dict(torch.load(args.checkpoint, map_location=device, weights_only=True))
     bot = ShowdownBot(username='Glaubermon', depth=args.depth, team=team_names[bot_side],
-                      checkpoint=args.checkpoint, stealth=False, evaluator=mode, load_config=False)
+                      model=model, checkpoint=args.checkpoint, stealth=False, evaluator=mode, load_config=False)
     forward_count = [0]
     def count_forward(*unused):
         forward_count[0] += 1
@@ -56,7 +61,8 @@ async def play_game(args, game_id, mode, out):
     start = time.monotonic()
     stats = dict(id=game_id, block=block, mode=mode, bot_side=bot_side, teams=team_names,
                  seed=seed, decisions=0, invalid_actions=[], fallbacks=0, latencies=[],
-                 status='running', winner=None)
+                 status='running', winner=None, device=str(device))
+    current_decision = None
     public = []
     trace_path = out / f'{mode}-{game_id:03d}.jsonl'
     try:
@@ -96,10 +102,13 @@ async def play_game(args, game_id, mode, out):
                         if req and not req.get('wait'):
                             socket.messages.clear()
                             t0 = time.monotonic()
+                            current_decision = dict(turn=frame['turn'], side=side+1,
+                                                    force_switch=bool(req.get('forceSwitch')))
                             await asyncio.wait_for(bot.handle_battle_turn('battle-gen9ou-local', req),
                                                    timeout=args.decision_seconds)
                             stats['latencies'].append(time.monotonic() - t0)
                             stats['decisions'] += 1
+                            current_decision = None
                             messages = [m for m in socket.messages if '|/choose ' in m or '|/team ' in m]
                             if len(messages) != 1:
                                 raise RuntimeError(f'Expected one choice, got {messages}')
@@ -126,6 +135,8 @@ async def play_game(args, game_id, mode, out):
     except asyncio.TimeoutError:
         stats['status'] = 'decision_timeout_forfeit'
         stats['winner'] = 'Control'
+        stats['failed_decision'] = dict(current_decision or {}, elapsed_seconds=time.monotonic()-t0,
+                                       limit_seconds=args.decision_seconds)
     except Exception as exc:
         stats['status'] = 'infrastructure_error'
         stats['error'] = repr(exc)
@@ -147,6 +158,11 @@ def run_job(args, game, mode, out):
 
 
 async def main(args):
+    from glaubermon.evaluation.replay_decision import inference_device
+    import math
+    actual_device = inference_device(getattr(args, 'device', 'auto'))
+    if not math.isfinite(args.decision_seconds) or args.decision_seconds <= 0:
+        raise ValueError('decision_seconds must be finite and positive')
     if args.games < 2 or args.games % 2:
         raise ValueError("Paired benchmark requires a positive even number of games")
     if Path('showdown_config.json').exists():
@@ -166,6 +182,8 @@ async def main(args):
                     adapter_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                     showdown_version=json.loads((Path(args.showdown)/'package.json').read_text())['version'],
                     poke_env_source=importlib.metadata.distribution('poke-env').read_text('direct_url.json'),
+                    actual_device=str(actual_device),
+                    cuda_device=torch.cuda.get_device_name(actual_device) if actual_device.type=='cuda' else None,
                     rules='gen9ou', transport='official Battle with player-filtered protocol IPC',
                     decision_timeout_policy='bot loses', invalid_action_policy='offending side loses',
                     turn_cap_policy='truncated, no fabricated winner', threads=1)
@@ -195,4 +213,6 @@ if __name__ == '__main__':
     p.add_argument('--seed', type=int, default=911)
     p.add_argument('--max-turns', type=int, default=300)
     p.add_argument('--decision-seconds', type=float, default=30)
+    p.add_argument('--device', choices=['auto','cpu','cuda'], default='auto',
+                   help='Inference device; compare CPU and CUDA before selecting a benchmark device')
     asyncio.run(main(p.parse_args()))

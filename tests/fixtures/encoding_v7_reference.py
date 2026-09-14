@@ -1,7 +1,6 @@
 """Feature extraction and rich tensor encodings for Pokémon battle states."""
 
 from typing import Dict, List, Optional, Tuple
-import numpy as np
 import torch
 from glaubermon.core.battle_state import BattleState
 from glaubermon.core.pokemon import Pokemon, Move
@@ -65,14 +64,14 @@ def encode_volatiles(mon):
 
 def encode_restrictions(mon):
     # Presence is separate from move identity: public logs can leave it unknown.
-    result = np.zeros(15,dtype=np.float32)
+    result = torch.zeros(15,dtype=torch.float32)
     for i,key in enumerate(("encore","disable","leechseed")):
         result[i] = float(key in mon.volatiles)
     for offset,move_id in ((3,mon.volatiles.get("encore",{}).get("move")),
                            (7,mon.volatiles.get("disable",{}).get("move")),(11,mon.last_move)):
         for slot,move in enumerate(mon.moves[:4]):
             result[offset+slot] = float(move.id == move_id)
-    return torch.from_numpy(result)
+    return result
 
 
 def encode_callbacks(mon):
@@ -134,19 +133,19 @@ def encode_battle_state(state: BattleState) -> Tuple[Tuple[torch.Tensor, torch.T
         p2_tensor: Tuple of (moves (6, 4, MOVE_DIM), stats (6, STAT_DIM))
         field_tensor: Tensor of shape (40,) containing weather, terrain, hazards
     """
-    p1_moves_t = np.zeros((6, 4, MOVE_DIM), dtype=np.float32)
-    p1_stats_t = np.zeros((6, STAT_DIM), dtype=np.float32)
-    p2_moves_t = np.zeros((6, 4, MOVE_DIM), dtype=np.float32)
-    p2_stats_t = np.zeros((6, STAT_DIM), dtype=np.float32)
+    p1_moves_t = torch.zeros(6, 4, MOVE_DIM, dtype=torch.float32)
+    p1_stats_t = torch.zeros(6, STAT_DIM, dtype=torch.float32)
+    p2_moves_t = torch.zeros(6, 4, MOVE_DIM, dtype=torch.float32)
+    p2_stats_t = torch.zeros(6, STAT_DIM, dtype=torch.float32)
 
     for i in range(6):
         mon = state.p1.pokemon[i] if i < len(state.p1.pokemon) else None
         if mon and not mon.is_fainted:
             for j in range(min(4, len(mon.moves))):
-                p1_moves_t[i, j] = encode_move(mon.moves[j]).numpy()
-            p1_stats_t[i, 64:68] = encode_volatiles(mon).numpy()
-            p1_stats_t[i, 68:83] = encode_restrictions(mon).numpy()
-            p1_stats_t[i, 83:86] = encode_callbacks(mon).numpy()
+                p1_moves_t[i, j] = encode_move(mon.moves[j])
+            p1_stats_t[i, 64:68] = encode_volatiles(mon)
+            p1_stats_t[i, 68:83] = encode_restrictions(mon)
+            p1_stats_t[i, 83:86] = encode_callbacks(mon)
             p1_stats_t[i, 1] = mon.hp_percent
             p1_stats_t[i, 2] = 1.0 if i == state.p1.active_index else 0.0
             p1_stats_t[i, 3] = 1.0 if mon.is_terastallized else 0.0
@@ -172,10 +171,10 @@ def encode_battle_state(state: BattleState) -> Tuple[Tuple[torch.Tensor, torch.T
         mon = state.p2.pokemon[i] if i < len(state.p2.pokemon) else None
         if mon and not mon.is_fainted:
             for j in range(min(4, len(mon.moves))):
-                p2_moves_t[i, j] = encode_move(mon.moves[j]).numpy()
-            p2_stats_t[i, 64:68] = encode_volatiles(mon).numpy()
-            p2_stats_t[i, 68:83] = encode_restrictions(mon).numpy()
-            p2_stats_t[i, 83:86] = encode_callbacks(mon).numpy()
+                p2_moves_t[i, j] = encode_move(mon.moves[j])
+            p2_stats_t[i, 64:68] = encode_volatiles(mon)
+            p2_stats_t[i, 68:83] = encode_restrictions(mon)
+            p2_stats_t[i, 83:86] = encode_callbacks(mon)
             p2_stats_t[i, 1] = mon.hp_percent
             p2_stats_t[i, 2] = 1.0 if i == state.p2.active_index else 0.0
             p2_stats_t[i, 3] = 1.0 if mon.is_terastallized else 0.0
@@ -197,7 +196,7 @@ def encode_battle_state(state: BattleState) -> Tuple[Tuple[torch.Tensor, torch.T
         else:
             p2_stats_t[i, 0] = 1.0
 
-    field_tensor = np.zeros(FIELD_DIM, dtype=np.float32)
+    field_tensor = torch.zeros(FIELD_DIM, dtype=torch.float32)
     w_idx = WEATHER_MAP.get(state.weather, 0)
     field_tensor[w_idx % 8] = 1.0
     t_idx = TERRAIN_MAP.get(state.terrain, 0)
@@ -223,6 +222,6 @@ def encode_battle_state(state: BattleState) -> Tuple[Tuple[torch.Tensor, torch.T
         field_tensor[offset+5] = side.hazards.get(Hazard.TOXIC_SPIKES_1,0) / 2.0
         field_tensor[offset+6] = float(bool(side.hazards.get(Hazard.STICKY_WEB,0)))
 
-    p1_combined = (torch.from_numpy(p1_moves_t), torch.from_numpy(p1_stats_t))
-    p2_combined = (torch.from_numpy(p2_moves_t), torch.from_numpy(p2_stats_t))
-    return p1_combined, p2_combined, torch.from_numpy(field_tensor)
+    p1_combined = (p1_moves_t, p1_stats_t)
+    p2_combined = (p2_moves_t, p2_stats_t)
+    return p1_combined, p2_combined, field_tensor
