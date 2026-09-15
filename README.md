@@ -1,4 +1,4 @@
-> **Evaluación del candidato recibido:** seguir [RECUPERAR_EVALUACION.md](docs/RECUPERAR_EVALUACION.md) para diagnosticar CPU/CUDA y comparar los pesos congelados antes de entrenar más.
+> **Evaluación del candidato recibido:** seguir [RECUPERAR_EVALUACION.md](docs/RECUPERAR_EVALUACION.md) para validar la optimización del encoder y la búsqueda por lotes en CPU/CUDA y comparar los pesos congelados antes de entrenar más.
 
 > **Piloto habilitado para los cinco equipos validados.** Entrega con los comandos completos para NVIDIA: [docs/ENTRENAR_GPU.md](docs/ENTRENAR_GPU.md). La validación local fue en CPU; se recibió un candidato entrenado de 100 partidas y falta completar su evaluación. Ver [estado y pruebas](docs/alignment/ESTADO.md).
 

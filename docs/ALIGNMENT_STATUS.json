@@ -29,7 +29,7 @@
     "glaubermon/inference/log_deducer.py": "45af86ed4173c0ffd2836a2e2cf31105d763d14ee1a68f7a4ebbeec67b4c4425",
     "glaubermon/search/evaluators.py": "19359be99ea52e060e277d47b26b1808a28c48bf6bdcd5169ff622893f37bc04",
     "glaubermon/search/matrix_solver.py": "5e97733591abb09f2c85d5ad1727d7dc12d4a94d710dadc1d9662b2f80a18760",
-    "glaubermon/search/subgame_resolver.py": "dbf3a6a3cf8e5ddadf509202a9bbfd2145936234106b2ca30219b08fd55e508e",
+    "glaubermon/search/subgame_resolver.py": "9d5683fda00b7df65abf2397f509e0c53a11cc4acff75a4fc8c9fae115ff2fdf",
     "glaubermon/models/embeddings.py": "f687ea8ea11924f8e1765b1cc2e2d920e8e5469c1d26a75612175af5737e42be",
     "glaubermon/models/set_transformer.py": "d82919ad3c1099ecf7c64f9f1a69167d0c6363d7354440de50928561deeae741",
     "glaubermon/data/mass_dataset.py": "9b6f508c7e30d14272938f76f1f42384d53c08181099b34aa4eb403969b206cd",
@@ -50,7 +50,7 @@
     "docs/alignment/pilot-coverage.json": "9b8b563f401c129f4b250053f7427fac2f02a1fb76baf13616e98c8f927c6627",
     "glaubermon/evaluation/replay_decision.py": "af4eddfdc5c2dc1cbfdb1c418eade08e122b8c0dfea9e9e8c952cb93aaf20696",
     "glaubermon/evaluation/compare_checkpoints.py": "e5b181aa474d54401d6746d0514a35e8a729c264fa390b1452c1726c083330e8",
-    "glaubermon/evaluation/performance_recovery.py": "34d54315324560b3d9a843c569f6ec5eabc4f3294fd996abfbbbedf071fb6408"
+    "glaubermon/evaluation/performance_recovery.py": "5ba878a7214d7e2e5205bd4583cba7eb734a1f2d91b9a1d84d346a4faaafa20d"
   },
   "clearance_scope": "Controlled pilot using the pinned development training teams and official Showdown backend; no SOTA claim",
   "clearance_source": "cab336781b981dbbb02747c07321509bec0bcc99",
@@ -74,6 +74,12 @@
       "encoder_sha256": "f687ea8ea11924f8e1765b1cc2e2d920e8e5469c1d26a75612175af5737e42be",
       "change": "Direct feature array copies; no temporary tensors inside battle encoding; no pruning",
       "evidence": "docs/alignment/direct-encoding-results.json",
+      "gpu_revalidation_pending": true
+    },
+    {
+      "source": "d3ca2ef99074dafbcc28b1a723aac1141c2a712c",
+      "change": "Pool all independent replacement leaves into batches of 128, preserving matrix dependencies; automatic smoke timeout diagnosis",
+      "evidence": "docs/alignment/pooled-search-results.json",
       "gpu_revalidation_pending": true
     }
   ],

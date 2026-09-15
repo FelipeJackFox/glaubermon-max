@@ -1,5 +1,12 @@
 # Candidato entrenado recibido; recuperación de la evaluación
 
+## Entrega consolidada: hojas de reemplazo agrupadas
+
+Se agrupan hojas independientes para evaluar la red en lotes de hasta 128 sin eliminar alternativas. La optimización del encoder directo queda incluida. Se completaron ocho partidas nuevas con original y candidato congelados, profundidad 2 y límite de 30 s, sin timeouts, acciones inválidas ni fallbacks; 702 solicitudes auditadas sin discrepancias de menús legales/PP. La integración acumulada alcanza 51 partidas. [Evidencia de esta entrega](pooled-search-results.json).
+
+La reducción de llamadas a la red en los frames originales fue de 3,312 a 226 y de 1,905 a 269. Los últimos decimales pueden variar por la forma del lote; las elecciones se conservaron en los frames contrastados. La validación RTX y la comparación grande siguen pendientes. El [procedimiento vigente](../RECUPERAR_EVALUACION.md) sustituye las tandas de comandos anteriores y recoge automáticamente perfiles si falla por tiempo la comprobación corta. El historial siguiente conserva los resultados de cada versión.
+
+
 Se cerró el alcance de los cinco equipos acordados con Felipe/Santiago. `docs/ALIGNMENT_STATUS.json` permite el piloto exclusivamente con rollouts oficiales, versión, esquema, equipos y código validados. `AlphaZeroTrainer.train()` rechaza cambios fuera de ese contrato. Las tandas locales usan pesos congelados o modelos desechables; el 14 de septiembre se recibió el piloto de 100 partidas entrenado por Santiago. Los ocho archivos originales coinciden con el respaldo. La equivalencia general de Showdown y la mejora de juego siguen siendo hitos distintos.
 
 ## Optimización posterior: conversiones del encoder

@@ -77,7 +77,20 @@ def main():
     try:
         for name in checkpoints:
             if not benchmark(name,2,'smoke'):
-                report.update(status='smoke_failed',failed_checkpoint=name);save();raise SystemExit(2)
+                report.update(status='smoke_failed',failed_checkpoint=name);save()
+                # The two-game smoke stage is bounded: collect the failure profile
+                # in this same delivery, instead of requiring another operator run.
+                failed_dir=a.output/f'smoke-{name}'
+                failures=[json.loads(path.read_text()) for path in failed_dir.glob('hybrid-*.json')]
+                if any(row.get('status')=='decision_timeout_forfeit' for row in failures):
+                    try:
+                        run('diagnose_timeouts',['--benchmark',failed_dir,'--checkpoint',checkpoints[name],
+                            '--device',selected,'--output',a.output/f'diagnosis-{name}'],f'diagnosis-{name}')
+                        report['failure_diagnosis']='completed'
+                    except subprocess.CalledProcessError as exc:
+                        report['failure_diagnosis']=str(exc)
+                    save()
+                raise SystemExit(2)
         if a.games>2:
             report['status']='evaluating';save()
             for name in checkpoints:
