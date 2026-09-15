@@ -931,6 +931,66 @@ class SubgameResolver:
         self.switch_penalty = switch_penalty
         self.faint_penalty = faint_penalty
 
+    def _evaluate_leaf_states(self, states):
+        """Batch leaves across independent replacement matrices, without pruning.
+
+        Every switch combination and queued continuation is still simulated.
+        Matrices are solved bottom-up only after their leaf values are available.
+        The bounded batch limits inference memory, not the number of branches.
+        """
+        leaves, destinations, nodes = [], [], []
+
+        def flush():
+            if not leaves:
+                return
+            values = (self.evaluator.evaluate_batch(leaves) if hasattr(self.evaluator, "evaluate_batch")
+                      else [self.evaluator.evaluate(state) for state in leaves])
+            for (matrix, i, j), value in zip(destinations, values):
+                matrix[i, j] = float(value)
+            leaves.clear()
+            destinations.clear()
+
+        def leaf(state, target, i, j):
+            leaves.append(state)
+            destinations.append((target, i, j))
+            if len(leaves) == 128:
+                flush()
+
+        def replacement(state):
+            actions1 = state.get_valid_actions(1) if 1 in state.pending_switches else [None]
+            actions2 = state.get_valid_actions(2) if 2 in state.pending_switches else [None]
+            matrix = np.zeros((len(actions1), len(actions2)), dtype=np.float64)
+            children = []
+            for i, a1 in enumerate(actions1):
+                for j, a2 in enumerate(actions2):
+                    child = simulate_turn_transition(state, a1, a2)
+                    if child.is_game_over:
+                        matrix[i, j] = 15.0 if child.winner == 1 else (-15.0 if child.winner == 2 else 0.0)
+                    elif child.pending_switches:
+                        children.append((i, j, replacement(child)))
+                    else:
+                        leaf(child, matrix, i, j)
+            index = len(nodes)
+            nodes.append((matrix, children))
+            return index
+
+        result = np.zeros((len(states), 1), dtype=np.float64)
+        roots = []
+        for i, state in enumerate(states):
+            if state.pending_switches:
+                roots.append((i, replacement(state)))
+            else:
+                leaf(state, result, i, 0)
+        flush()
+        solved = []
+        for matrix, children in nodes:
+            for i, j, child_index in children:
+                matrix[i, j] = solved[child_index]
+            solved.append(float(solve_zero_sum_game(matrix)[2]))
+        for i, node_index in roots:
+            result[i, 0] = solved[node_index]
+        return result[:, 0]
+
     def _resolve_replacements(self, state, depth, sample, return_both_players=False):
         """Only the requested sides choose; queued attacks resume on that choice.
 
@@ -1116,17 +1176,8 @@ class SubgameResolver:
                         eval_coords.append((i, j, 0))
 
         if states_to_eval:
-            # Replacement nodes must resolve their remaining turn before evaluation.
-            batch_indices = [i for i,child in enumerate(states_to_eval) if not child.pending_switches]
-            batch_states = [states_to_eval[i] for i in batch_indices]
-            values = {}
-            if batch_states:
-                batch_values = (self.evaluator.evaluate_batch(batch_states) if hasattr(self.evaluator,"evaluate_batch")
-                                else [self.evaluator.evaluate(child) for child in batch_states])
-                values.update(zip(batch_indices,batch_values))
-            for i,child in enumerate(states_to_eval):
-                if child.pending_switches:
-                    values[i] = self._resolve_replacements(child,0,False)[3]
+            # Pool independent replacement leaves before invoking the evaluator.
+            values = self._evaluate_leaf_states(states_to_eval)
             for k,(i,j,tie_idx) in enumerate(eval_coords):
                 if tie_idx == 0:
                     base_M[i,j] = float(values[k])
